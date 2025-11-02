@@ -1,0 +1,19 @@
+<article class="card">
+    <img [src]="item.sprites.front_default" [alt]="item.name" />
+    <h2>{{ item.name | titlecase }}</h2>
+
+    <div class="types">
+    <span *ngFor="let t of item.types" class="type">{{ t.type.name }}</span>
+    </div>
+
+    <div class="stats">
+    <p *ngFor="let s of item.stats">
+        <strong>{{ s.stat.name | uppercase }}:</strong> {{ s.base_stat }}
+    </p>
+    </div>
+
+    <!-- <div *ngIf="evolutions().length" class="evolutions">
+    <h4>Evoluções:</h4>
+    <span *ngFor="let e of evolutions()">{{ e | titlecase }}</span>
+    </div> -->
+</article>

@@ -1,0 +1,13 @@
+
+<div class="container">
+    <div *ngIf="loading()" class="loading">Carregando...</div>
+    <section class="grid" *ngIf="!loading()">
+        <app-card *ngFor="let pokemon of pokemons()" [pokemon]="pokemon"></app-card>
+    </section>
+    <app-pagination
+        [totalItems]="count"
+        [itemsPerPage]="limit"
+        [currentPage]="page"
+        (pageChange)="onPageChange($event)">
+  </app-pagination>
+</div>
