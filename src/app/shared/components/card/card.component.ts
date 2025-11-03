@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Pokemon } from '../../../core/models/pokemon.model';
 import { NgFor, NgIf, TitleCasePipe, UpperCasePipe } from '@angular/common';
 
@@ -11,4 +11,5 @@ import { NgFor, NgIf, TitleCasePipe, UpperCasePipe } from '@angular/common';
 })
 export class CardComponent {
   @Input('pokemon') item!: Pokemon;
+  @Output() select = new EventEmitter<Pokemon>();
 }

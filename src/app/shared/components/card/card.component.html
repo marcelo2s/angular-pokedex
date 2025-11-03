@@ -1,4 +1,4 @@
-<article class="card">
+<article class="card" (click)="select.emit(item)">
     <img [src]="item.sprites.front_default" [alt]="item.name" />
     <h2>{{ item.name | titlecase }}</h2>
 

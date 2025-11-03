@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, computed } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { NgIf, NgFor } from '@angular/common';
 
 @Component({
@@ -9,7 +9,7 @@ import { NgIf, NgFor } from '@angular/common';
     <nav class="pagination" *ngIf="totalPages > 1">
       <button (click)="prevPage()" [disabled]="currentPage === 1" aria-label="Anterior">←</button>
 
-      <ng-container *ngFor="let item of visiblePages()">
+      <ng-container *ngFor="let item of visiblePages">
         <button
           *ngIf="item !== '...'; else dots"
           (click)="goToPage(item)"
@@ -33,6 +33,7 @@ import { NgIf, NgFor } from '@angular/common';
       margin-top: 1.5rem;
       flex-wrap: nowrap;
       overflow-x: auto;
+      animation: fadeIn 0.3s ease; /* 🔹 animação de entrada suave */
     }
 
     button {
@@ -44,28 +45,45 @@ import { NgIf, NgFor } from '@angular/common';
       cursor: pointer;
       font-weight: 500;
       font-family: 'Rajdhani', sans-serif;
-      transition: background 0.2s ease;
+      transition: 
+        background 0.25s ease,
+        transform 0.15s ease,
+        opacity 0.2s ease;
       flex-shrink: 0;
     }
 
     button:hover:not(:disabled) {
       background: #c62828;
+      transform: translateY(-1px);
+    }
+
+    button:active:not(:disabled) {
+      transform: translateY(1px);
     }
 
     button:disabled {
       opacity: 0.5;
       cursor: not-allowed;
+      transform: none;
     }
 
     .active {
       background: #b71c1c;
       font-weight: 700;
+      transform: scale(1.05);
     }
 
     .dots {
       color: #b71c1c;
       font-weight: bold;
       padding: 0 0.5rem;
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   `]
 })
@@ -79,37 +97,41 @@ export class PaginationComponent {
     return Math.ceil(this.totalItems / this.itemsPerPage);
   }
 
-  /** 🔹 Gera as páginas visíveis, com "..." entre blocos distantes */
-  visiblePages() {
+  get visiblePages(): (number | string)[] {
     const total = this.totalPages;
     const current = this.currentPage;
-    const delta = 1; // páginas vizinhas de cada lado
-    const range: (number | string)[] = [];
-    const rangeWithDots: (number | string)[] = [];
+    const pages: (number | string)[] = [];
 
-    // Sempre mostrar a primeira e última
-    const left = Math.max(2, current - delta);
-    const right = Math.min(total - 1, current + delta);
-
-    range.push(1);
-    for (let i = left; i <= right; i++) {
-      range.push(i);
-    }
-    if (total > 1) range.push(total);
-
-    // Adiciona "..." onde houver intervalo grande
-    let last: number | undefined;
-    for (const page of range) {
-      if (last) {
-        if (typeof page === 'number' && page - last > 1) {
-          rangeWithDots.push('...');
-        }
-      }
-      rangeWithDots.push(page);
-      if (typeof page === 'number') last = page;
+    if (total <= 7) {
+      for (let i = 1; i <= total; i++) pages.push(i);
+      return pages;
     }
 
-    return rangeWithDots;
+    const leftBoundary = 3;
+    const rightBoundary = total - 2;
+    const showLeftDots = current > leftBoundary + 2;
+    const showRightDots = current < rightBoundary - 1;
+
+    for (let i = 1; i <= 3; i++) pages.push(i);
+
+    if (showLeftDots) pages.push('...');
+
+    const start = Math.max(current - 1, 4);
+    const end = Math.min(current + 1, total - 3);
+
+    for (let i = start; i <= end; i++) {
+      if (i > 3 && i < total - 2) pages.push(i);
+    }
+
+    if (showRightDots) pages.push('...');
+
+    for (let i = total - 2; i <= total; i++) {
+      pages.push(i);
+    }
+
+    return Array.from(new Set(pages)).sort((a, b) =>
+      a === '...' ? 1 : b === '...' ? -1 : (a as number) - (b as number)
+    );
   }
 
   goToPage(page: number | string) {

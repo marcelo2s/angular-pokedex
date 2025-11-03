@@ -1,48 +1,49 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { forkJoin, Observable, switchMap } from 'rxjs';
+import { Observable, forkJoin, map, switchMap } from 'rxjs';
 import { Pokemon } from '../models/pokemon.model';
 
 @Injectable({ providedIn: 'root' })
 export class PokemonService {
-  private http = inject(HttpClient);
-  private readonly baseUrl = 'https://pokeapi.co/api/v2';
+  private readonly API_URL = 'https://pokeapi.co/api/v2';
+
+  constructor(private http: HttpClient) {}
 
   /**
-   * Lista pokémons com paginação.
-   * @param limit Quantos pokémons retornar por página.
-   * @param offset A partir de qual índice começar (ex: 0, 20, 40...).
+   * 🔹 Retorna uma lista de Pokémons com seus detalhes básicos.
    */
-  getPokemons(limit = 20, offset = 0): Observable<Pokemon[]> {
+  getPokemons(limit = 12, offset = 0): Observable<Pokemon[]> {
     return this.http
-        .get<{ results: { name: string, url: string }[] }>(
-            `${this.baseUrl}/pokemon?limit=${limit}&offset=${offset}`
-        )
-        .pipe(
-            switchMap(response =>
-                forkJoin(response.results.map(r => this.getPokemon(r.name))) as Observable<Pokemon[]>
-            )
-        );
-  }
-
-  getPokemon(nameOrId: string | number): Observable<Pokemon> {
-    return this.http.get<Pokemon>(`${this.baseUrl}/pokemon/${nameOrId}`);
-  }
-
-
-  /**
-   * Busca os detalhes de um Pokémon pelo nome ou ID.
-   * @param nameOrId Nome ou ID do Pokémon (ex: "pikachu" ou 25).
-   */
-  getPokemonDetails(nameOrId: string | number): Observable<Pokemon> {
-    return this.http.get<Pokemon>(`${this.baseUrl}/pokemon/${nameOrId}`);
+      .get<{ results: { name: string; url: string }[] }>(
+        `${this.API_URL}/pokemon?limit=${limit}&offset=${offset}`
+      )
+      .pipe(
+        switchMap((response) => {
+          const requests = response.results.map((p) =>
+            this.http.get<Pokemon>(p.url)
+          );
+          return forkJoin(requests);
+        })
+      );
   }
 
   /**
-   * Busca informações extras da espécie do Pokémon (opcional).
-   * @param nameOrId Nome ou ID do Pokémon.
+   * 🔹 Retorna os detalhes completos de um Pokémon pelo nome.
+   * Compatível com o tipo `Pokemon`.
    */
-  getPokemonSpecies(nameOrId: string | number): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/pokemon-species/${nameOrId}`);
+  getPokemonByName(name: string): Observable<Pokemon> {
+    return this.http.get<Pokemon>(`${this.API_URL}/pokemon/${name}`).pipe(
+      map((data) => ({
+        id: data.id,
+        name: data.name,
+        height: data.height,
+        weight: data.weight,
+        types: data.types,
+        abilities: data.abilities,
+        stats: data.stats,
+        sprites: data.sprites,
+        species: data.species,
+      }))
+    );
   }
 }

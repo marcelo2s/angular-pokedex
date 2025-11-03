@@ -4,6 +4,7 @@ import { PokemonService } from '../../core/services/pokemon.service';
 import { Pokemon } from '../../core/models/pokemon.model';
 import { NgFor, NgIf } from '@angular/common';
 import { PaginationComponent } from '../../shared/components/pagination/pagination.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-pokemon-catalog',
@@ -14,6 +15,7 @@ import { PaginationComponent } from '../../shared/components/pagination/paginati
 })
 export class PokemonCatalogComponent implements OnInit {
   private service = inject(PokemonService);
+  private router = inject(Router);
   pokemons = signal<Pokemon[]>([]);
   loading = signal(true);
 
@@ -40,4 +42,8 @@ loadPage() {
     }
   });
 }
+
+  goToDetails(pokemon: Pokemon) {
+    this.router.navigate(['/pokemon', pokemon.name]);
+  }
 }
