@@ -1,5 +1,16 @@
 <article class="card" (click)="select.emit(item)">
-    <img [src]="item.sprites.front_default" [alt]="item.name" />
+    <div class="image-container">
+        <img 
+            [src]="item.sprites.front_default" 
+            [alt]="item.name"
+            (error)="imageError = true"
+            *ngIf="!imageError, else fallback" 
+        />
+        <ng-template #fallback>
+            <div class="image-placeholder">?</div>
+        </ng-template>
+    </div>
+
     <h2>{{ item.name | titlecase }}</h2>
 
     <div class="types">
@@ -12,8 +23,8 @@
     </p>
     </div>
 
-    <!-- <div *ngIf="evolutions().length" class="evolutions">
-    <h4>Evoluções:</h4>
-    <span *ngFor="let e of evolutions()">{{ e | titlecase }}</span>
-    </div> -->
+    <div class="actions">
+        <button class="details-btn" (click)="select.emit(item); $event.stopPropagation()">Detalhes</button>
+        <button class="delete-btn" (click)="delete.emit(item); $event.stopPropagation()">Excluir</button>
+    </div>
 </article>

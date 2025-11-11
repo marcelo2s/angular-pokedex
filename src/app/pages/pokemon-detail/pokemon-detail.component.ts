@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { PokemonService } from '../../core/services/pokemon.service';
 import { EvolutionService } from '../../core/services/evolution.service';
 
@@ -13,6 +13,7 @@ import { EvolutionService } from '../../core/services/evolution.service';
 })
 export class PokemonDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
+  private location = inject(Location);
   private pokemonService = inject(PokemonService);
   private evolutionService = inject(EvolutionService);
 
@@ -47,5 +48,9 @@ export class PokemonDetailComponent implements OnInit {
 
   formatId(id: number): string {
     return id.toString().padStart(3, '0');
+  }
+
+  goBack() {
+    this.location.back();
   }
 }

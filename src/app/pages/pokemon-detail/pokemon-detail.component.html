@@ -1,48 +1,49 @@
 <main *ngIf="!loading(); else loadingTpl" class="detail-container">
-    <section class="header">
-      <div class="image">
-        <img [src]="pokemon()?.sprites.front_default" [alt]="pokemon()?.name" />
+  <button class="back-btn" (click)="goBack()">← Voltar</button>
+  <section class="header">
+    <div class="image">
+      <img [src]="pokemon()?.sprites.front_default" [alt]="pokemon()?.name" />
+    </div>
+    <div class="info">
+      <h1>{{ pokemon()?.name | titlecase }}</h1>
+      <span class="id">#{{ formatId(pokemon()?.id) }}</span>
+
+      <div class="types">
+        <span *ngFor="let t of pokemon()?.types" class="type">{{ t.type.name }}</span>
       </div>
-      <div class="info">
-        <h1>{{ pokemon()?.name | titlecase }}</h1>
-        <span class="id">#{{ formatId(pokemon()?.id) }}</span>
-  
-        <div class="types">
-          <span *ngFor="let t of pokemon()?.types" class="type">{{ t.type.name }}</span>
-        </div>
-  
-        <p><strong>Altura:</strong> {{ pokemon()?.height / 10 }} m</p>
-        <p><strong>Peso:</strong> {{ pokemon()?.weight / 10 }} kg</p>
-  
-        <p><strong>Habilidades:</strong> 
-          <span *ngFor="let a of pokemon()?.abilities; let last = last">
-            {{ a.ability.name | titlecase }}<span *ngIf="!last">, </span>
-          </span>
-        </p>
+
+      <p><strong>Altura:</strong> {{ pokemon()?.height / 10 }} m</p>
+      <p><strong>Peso:</strong> {{ pokemon()?.weight / 10 }} kg</p>
+
+      <p><strong>Habilidades:</strong> 
+        <span *ngFor="let a of pokemon()?.abilities; let last = last">
+          {{ a.ability.name | titlecase }}<span *ngIf="!last">, </span>
+        </span>
+      </p>
+    </div>
+  </section>
+
+  <section class="stats">
+    <h2>Estatísticas Base</h2>
+    <div class="stat" *ngFor="let s of pokemon()?.stats">
+      <span class="name">{{ s.stat.name | titlecase }}</span>
+      <div class="bar">
+        <div class="fill" [style.width.%]="s.base_stat / 2"></div>
       </div>
-    </section>
-  
-    <section class="stats">
-      <h2>Estatísticas Base</h2>
-      <div class="stat" *ngFor="let s of pokemon()?.stats">
-        <span class="name">{{ s.stat.name | titlecase }}</span>
-        <div class="bar">
-          <div class="fill" [style.width.%]="s.base_stat / 2"></div>
-        </div>
-        <span class="value">{{ s.base_stat }}</span>
+      <span class="value">{{ s.base_stat }}</span>
+    </div>
+  </section>
+
+  <section *ngIf="evolutions().length" class="evolutions">
+    <h2>Evoluções</h2>
+    <div class="evolution-list">
+      <div class="evolution" *ngFor="let evo of evolutions()">
+        <img [src]="'https://img.pokemondb.net/sprites/home/normal/' + evo + '.png'" [alt]="evo" />
+        <p>{{ evo | titlecase }}</p>
       </div>
-    </section>
-  
-    <section *ngIf="evolutions().length" class="evolutions">
-      <h2>Evoluções</h2>
-      <div class="evolution-list">
-        <div class="evolution" *ngFor="let evo of evolutions()">
-          <img [src]="'https://img.pokemondb.net/sprites/home/normal/' + evo + '.png'" [alt]="evo" />
-          <p>{{ evo | titlecase }}</p>
-        </div>
-      </div>
-    </section>
-  </main>
+    </div>
+  </section>
+</main>
   
   <ng-template #loadingTpl>
     <p class="loading">Carregando detalhes...</p>

@@ -1,11 +1,11 @@
-
 <div class="container">
     <div *ngIf="loading()" class="loading">Carregando...</div>
     <section class="grid" *ngIf="!loading()">
         <app-card 
             *ngFor="let pokemon of pokemons()" 
             [pokemon]="pokemon"
-            (select)="goToDetails(pokemon)">
+            (select)="goToDetails(pokemon)"
+            (delete)="deletePokemon(pokemon)">
         </app-card>
     </section>
     <app-pagination

@@ -19,12 +19,17 @@ export class PokemonCatalogComponent implements OnInit {
   pokemons = signal<Pokemon[]>([]);
   loading = signal(true);
 
-  limit = 12;
+  limit = 15;
   page = 1;
-  count = 0;
+  count = 1302;
 
   ngOnInit() {
-    this.loadPage();
+    if(!this.service.hasCachedList()) {
+      this.loadPage();
+    } else {
+      this.pokemons.set(this.service.getCachedList());
+      this.loading.set(false);
+    }
   }
 
   onPageChange(page: number) {
@@ -34,16 +39,23 @@ export class PokemonCatalogComponent implements OnInit {
 
 loadPage() {
   const offset = (this.page - 1) * this.limit;
+  this.loading.set(true);
   this.service.getPokemons(this.limit, offset).subscribe({
     next: res => {
       this.pokemons.set(res);
+      this.service.cacheList(res);
       this.loading.set(false);
-      this.count = 1302;
     }
   });
 }
 
   goToDetails(pokemon: Pokemon) {
     this.router.navigate(['/pokemon', pokemon.name]);
+  }
+
+  deletePokemon(pokemon: Pokemon) {
+    const updated = this.pokemons().filter(p => p.name !== pokemon.name);
+    this.pokemons.set(updated);
+    this.service.cacheList(updated);
   }
 }
